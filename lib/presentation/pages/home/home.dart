@@ -26,11 +26,23 @@ class _HomeScreenState extends State<HomeScreen> {
     final appBloc = context.read<AppBloc>();
     appBloc.add(const AppEventInitDatabase());
     appBloc.add(const AppEventGetUserData());
+    _loadNotificationTime();
   }
 
   Future<void> _askUserName() async {
     String? name = await _showNameInputDialog();
 
+  }
+
+  Future<void> _loadNotificationTime() async {
+    TimeOfDay? storedTime = await getStoredNotificationTime();
+    if (storedTime != null) {
+      NotificationService.scheduleDailyNotification(
+        time: Time(storedTime.hour, storedTime.minute),
+        body: "Don't forget to record your weight today!",
+      );
+
+    }
   }
 
   Future<String?> _showNameInputDialog() {
@@ -69,6 +81,7 @@ class _HomeScreenState extends State<HomeScreen> {
         time: Time(pickedTime.hour, pickedTime.minute),
         body: "Don't forget to record your weight today!",
       );
+      await storeNotificationTime(pickedTime);
     }
   }
 
@@ -89,6 +102,24 @@ class _HomeScreenState extends State<HomeScreen> {
         );
       },
     );
+  }
+
+  Future<void> _changeNotificationTime(BuildContext context) async {
+    TimeOfDay? pickedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+
+    if (pickedTime != null) {
+      NotificationService.scheduleDailyNotification(
+        time: Time(pickedTime.hour, pickedTime.minute),
+        body: "Don't forget to record your weight today!",
+      );
+      await storeNotificationTime(pickedTime);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Notification time changed to ${pickedTime.format(context)}')),
+      );
+    }
   }
 
 
@@ -167,13 +198,27 @@ class _HomeScreenState extends State<HomeScreen> {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _showAddWeightSheet(context);
-        },
-        backgroundColor: Colors.purple,
-        shape: const CircleBorder(),
-        child: const Icon(Icons.add, size: 36, color: Colors.white),
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FloatingActionButton(
+            onPressed: () {
+              _showAddWeightSheet(context);
+            },
+            backgroundColor: Colors.purple,
+            shape: const CircleBorder(),
+            child: const Icon(Icons.add, size: 36, color: Colors.white),
+          ),
+          const SizedBox(height: 16), // Spacing between buttons
+          FloatingActionButton(
+            onPressed: () {
+              _changeNotificationTime(context);
+            },
+            backgroundColor: Colors.blue,
+            shape: const CircleBorder(),
+            child: const Icon(Icons.notifications, size: 36, color: Colors.white),
+          ),
+        ],
       ),
     );
   }
