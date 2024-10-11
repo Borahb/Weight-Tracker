@@ -10,6 +10,8 @@ import 'package:weight_tracker/presentation/components/home/weight_entry_card_wi
 import 'package:weight_tracker/utils/app_utils.dart';
 
 class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
