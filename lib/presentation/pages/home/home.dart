@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:weight_tracker/domain/bloc/app_bloc/app_bloc.dart';
 import 'package:weight_tracker/domain/service/notification_service.dart';
 import 'package:weight_tracker/presentation/components/home/add_weight_bottomsheet.dart';
+import 'package:weight_tracker/presentation/components/home/weight_entry_card_widget.dart';
 import 'package:weight_tracker/utils/app_utils.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -89,47 +90,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
 
-
-  Widget _buildWeightEntryTile(DateTime date, Map<String, dynamic>? entry) {
-    bool isMissedDay = entry == null;
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-      elevation: 3,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      color: isMissedDay ? Colors.red.shade100 : Colors.white,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  isMissedDay
-                      ? 'Missed Entry'
-                      : 'Weight: ${entry!['weight']} kg',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: isMissedDay ? Colors.red : Colors.black,
-                  ),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  DateFormat('EEEE, MMM d').format(date),
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
-                ),
-              ],
-            ),
-            if (!isMissedDay)
-              const Icon(Icons.check, color: Colors.green),
-          ],
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -196,7 +156,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       String dateKey = DateFormat('yyyy-MM-dd').format(currentDate);
                       Map<String, dynamic>? entry = entryMap[dateKey];
 
-                      return _buildWeightEntryTile(currentDate, entry);
+                      return WeightEntryTile(date: currentDate,entry: entry,);
                     },
                   ),
                 ),
